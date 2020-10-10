@@ -21,7 +21,7 @@ def q3():
     plt.show()
 
 def q4():
-    
+    pass
 
 
 def main():
