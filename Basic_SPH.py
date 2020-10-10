@@ -12,11 +12,17 @@
 #7 repeat from step 2
 
 import random
+import numpy as np
 
 #a function for the smoothing kernel (see lecture 2 page 20)
 def spline(r,h):
+    """
+    Cubic spline smoothing kernel (1D)
+    sigma: normalisation constant
+    h: smoothing length
+    r: r_j-r distance between the particles
+    """
     sigma = 2/3
-    dims = 1
     q = r/h
     #the otherwise case
     if(q>2 or q<0):
@@ -27,6 +33,29 @@ def spline(r,h):
     #the 1<=q<=2 cae
     else:
         return sigma*((2-q)**3)/(4*h)
+
+def gradSpline(r,h):
+    """
+    Gradient of the cubic spline smoothing kernel (1D)
+    sigma: normalisation constant
+    h: smoothing length
+    r: r_j-r distance between the particles
+
+    in 1D dW/dx = (x_j-x)/|x_j-x|*dW/dr
+    """
+    sigma = 2/3
+    q = r/h
+    k = r/abs(r)
+    #the otherwise case
+    if(q>2 or q<0):
+        return 0
+    #the 0<=q<=1 case
+    elif(q<=1):
+        return k*sigma/h*(3*q+9/4*q**2)
+    #the 1<=q<=2 cae
+    else:
+        return k*sigma*(-3*(2-q)**2)/(4*h) 
+
 
 #same as the calculate_property function but using the fact that the two densities cancel
 #see lecture 2 page 22
@@ -46,25 +75,9 @@ def calculate_property(property,position,particles):
         p+=particle['mass']/particle['density']*particle[property]*spline(r,random.random()) #using a random number for h, refine to improve
     return p
 
-#creates a dictionary of random values to be the initial conditions of the particles
-def create_particle():
-    position = random.random()*1000
-    mass = random.random()
-    velocity = random.random()*100
-    return {'position':position,'mass':mass,'velocity':velocity,'density':0}
 
 def main():
-    #how many particles in the system
-    N = 1000
-    #speed of sound for calculating pressure, using the speed from dry air
-    c = 343
-    particles = []
-    #generate the list of particles
-    for i in range(0,N):
-        particles.append(create_particle())
-    #generate the densities for each particle
-    for particle in particles:
-        particle['density'] = calculate_density(particle['position'],particles)
+    pass
     
 
 
